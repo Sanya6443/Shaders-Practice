@@ -76,16 +76,14 @@ float getLight(vec3 pos, vec3 lightDir) {
     }
     
     float beer = exp(-shadowDensity * 3.0);
-    // Powder Effect: делает глубокие части облака темнее, а края мягче
     float powder = 1.0 - exp(-shadowDensity * 6.0);
     
-    return beer * powder * 2.0; // 2.0 для яркости
+    return beer * powder * 2.0;
 }
 
 
 
 
-// Используем vec4: xyz — это цвет (RGB), w — прозрачность (Alpha)
 vec4 rayMarching(vec3 origin, vec3 dir, float stepsize, vec3 lightDir) {
     float transmission = 1.0;
     vec3 lightAccum = vec3(0.0);
@@ -99,11 +97,10 @@ vec4 rayMarching(vec3 origin, vec3 dir, float stepsize, vec3 lightDir) {
             float intensity = getLight(pos, lightDir);
             float stepDensity = d * stepsize;
 
-            // Цветовой градиент: внутри облако чуть синее/темнее, снаружи белое
             vec3 sliceColor = mix(vec3(0.3, 0.4, 0.5), vec3(1.0), intensity);
             
             lightAccum += sliceColor * stepDensity * transmission;
-            transmission *= exp(-stepDensity * 4.0); // Поглощение
+            transmission *= exp(-stepDensity * 4.0);
         }
 
         t += stepsize;
