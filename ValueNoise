@@ -1,0 +1,68 @@
+float random2(int x, int y)
+{
+    int n = int(x * 374761393 + y * 668265263);
+    uint u_n = uint(n);
+    u_n = (u_n ^ (u_n >> 13u)) * 1274126177u;
+    n = int(u_n);
+    uint masked_n = uint(n) & 0x7FFFFFFFu;
+    return float(masked_n) / 2147483647.0; 
+
+}
+float lerp(float a, float b, float c)
+{
+    return a + (b - a) * c;
+}
+float smooth2(float t)
+{
+    return t * t * (3.0 - 2.0 * t);
+}
+float noise(float x, float y)
+{
+    int x0 = int(floor(x));
+    int y0 = int(floor(y));
+    int x1 = x0 + 1;
+    int y1 = y0 + 1;
+    
+    float sx = smooth2(x - float(x0));
+    float sy = smooth2(y - float(y0));
+    
+    float v00 = random2(x0, y0);
+    float v10 = random2(x1, y0);
+    float v01 = random2(x0, y1);
+    float v11 = random2(x1, y1);
+    
+    float ix0 = lerp(v00, v10, sx);
+    float ix1 = lerp(v01, v11, sx);
+    
+    float result = lerp(ix0, ix1, sy);
+    return result;
+}
+vec3 palette(float t)
+{
+    vec3 a = vec3(0.5,0.5,0.5);
+    vec3 b = vec3(0.5,0.5,0.5);
+    vec3 c = vec3(1.0,1.0,1.0);
+    vec3 d = vec3(0.263,0.416,0.557);
+    return a + b * cos(6.28318*(c*t+d));
+}
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    float m = 0.01;
+    float dirx = 0.0;
+    float diry = iTime * 2.0;
+    vec2 uv = fragCoord/iResolution.xy * 2.0 - 1.0;
+    vec3 finalcol = vec3(0.0);
+    uv.x *= iResolution.x/iResolution.y;
+    vec2 uv0 = uv;
+    uv = abs(fract(uv * 2.0) - 0.5);
+    uv *= mat2(cos(iTime), -sin(iTime),sin(iTime),  cos(iTime));
+    float n = noise(fragCoord.x * m + dirx, fragCoord.y  * m + diry) + iTime /2.0;
+    float b = length(uv0) + n * 2.0;
+    vec3 col = palette(b * 0.5);
+    b = sin(b*6.0) / 6.0;
+    b = abs(b);
+    b = 0.1/b;
+    finalcol += col *= b;
+
+    fragColor = vec4(finalcol,1.0);
+}
