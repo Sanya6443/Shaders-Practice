@@ -16,7 +16,7 @@ float smooth2(float t)
 {
     return t * t * (3.0 - 2.0 * t);
 }
-float noice(vec3 v)
+float noise(vec3 v)
 {
     int x0 = int(floor(v.x));
     int y0 = int(floor(v.y));
@@ -59,7 +59,7 @@ float cloudNoise(vec3 v) {
     float amp = 0.5;
     float freq = 1.0;
     for(int i = 0; i < 4; i++) {
-        sum += noice(p * freq) * amp;
+        sum += noise(p * freq) * amp;
         amp *= 0.5;
         freq *= 2.0;
     }
